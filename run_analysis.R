@@ -39,14 +39,16 @@ ActNumber <- rbind(RAW[[7]],RAW[[8]])  # train over test
 
 ##3. Use descriptive activity names to name the activities in the data set.
 ActNumFact <- as.factor(ActNumber$V1)        # to rename, must be factor
-levels(ActNumFact) <- as.vector(RAW[[4]]$V2) # Rename Activity levels (keep correct order)
+# Rename Activity levels (keep correct order)
+levels(ActNumFact) <- as.vector(RAW[[4]]$V2) 
 
 ## 2. Extract only the measurements on the mean and standard deviation for
 ##    each measurement.
-VarNames <- RAW[[3]]$V2                    # Create a variable containing labels
-Nidx <- grep("(mean\\(|std\\())",VarNames) # Use "(" so it doesn't find meanFreq
+VarNames <- RAW[[3]]$V2  # Create a variable containing labels
+# Use "(" as part of the search so it doesn't find meanFreq
+Nidx <- grep("(mean\\(|std\\())",VarNames) 
 names(allDATA)[Nidx] <- as.character(VarNames[Nidx]) # replace column names
-tmpDATA <- allDATA[Nidx]                   # Only pick "std()" and "mean()" columns
+tmpDATA <- allDATA[Nidx] # New data set with only "std()" and "mean()" columns
 
 ##   4. Appropriately label the data set with descriptive variable names.
 VarNAMES <- names(tmpDATA)
@@ -57,13 +59,14 @@ VarNAMES <- gsub("BodyBody","Body",VarNAMES) # Fix typo of "BodyBody" to "Body"
 names(tmpDATA) <- VarNAMES
 
 DATA <- cbind(Subject,ActNumFact,tmpDATA) # This is the working data set.
-rm(list=setdiff(ls(),"DATA"))
-names(DATA)[[1]] <- "Subject"
+rm(list=setdiff(ls(),"DATA"))             # Remove all other variables
+names(DATA)[[1]] <- "Subject"             # Name the 1st and 2nd columns
 names(DATA)[[2]] <- "Activity"
 
 ##   5. Create a second, independent tidy data set with the average of each
 ##      variable for each activity and each subject.
-TIDY <- aggregate(DATA[,-1:-2],list(Subject=DATA$Subject,Activity=DATA$Activity),mean)
+TIDY <- aggregate(DATA[,-1:-2],list(Subject=DATA$Subject,
+                                    Activity=DATA$Activity),mean)
 write.table(TIDY,file="TIDY.txt")
 #rm(TIDY)
 #TIDY2 <- read.table("TIDY.txt")
